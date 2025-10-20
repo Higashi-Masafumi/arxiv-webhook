@@ -1,6 +1,7 @@
 import os
 import re
 from logging import INFO, FileHandler, getLogger
+import sentry_sdk
 
 import arxiv
 from dotenv import load_dotenv
@@ -18,6 +19,10 @@ notion = Client(auth=os.getenv("NOTION_TOKEN"))
 logger = getLogger(__name__)
 logger.addHandler(FileHandler("app.log"))
 logger.setLevel(INFO)
+sentry_sdk.init(
+    dsn="https://d3eb762daf497b091c917c72d13f7168@o4509661921083392.ingest.us.sentry.io/4510221999865856",
+    send_default_pii=True,
+)
 
 
 def extract_arxiv_id(url: str) -> str | None:
@@ -82,6 +87,11 @@ def update_notion_page(page_id: str, arxiv_info: ArxivInfo):
 @app.get("/")
 async def root():
     return {"message": "ArXiv Webhook Service"}
+
+
+@app.get("/sentry-debug")
+async def sentry_debug():
+    division_by_zero = 1 / 0
 
 
 @app.post("/webhook")
