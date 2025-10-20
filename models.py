@@ -2,17 +2,9 @@ from pydantic import BaseModel, StrictInt, StrictStr
 
 
 class ArxivInfo(BaseModel):
+    page_id: StrictStr | None = None
     title: StrictStr
     authors: list[StrictStr]
     summary: StrictStr
+    url: StrictStr
     publication_year: StrictInt
-
-    def to_notion_properties(self) -> dict:
-        return {
-            "Title": {"title": [{"text": {"content": self.title}}]},
-            "Authors": {
-                "rich_text": [{"text": {"content": author}} for author in self.authors]
-            },
-            "Summary": {"rich_text": [{"text": {"content": self.summary}}]},
-            "Publication Year": {"number": self.publication_year},
-        }
