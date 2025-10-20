@@ -25,7 +25,7 @@ class ArxivInfoNotionMapper(NotionMapper[ArxivInfo]):
         TitleProperty, TitlePropertyRequest, StrictStr
     ] = Field(
         notion_name="Title",
-        parser=lambda x: x.title[0].plain_text,
+        parser=lambda x: x.title[0].plain_text if len(x.title) > 0 else "",
         request_builder=lambda x: TitlePropertyRequest(
             title=[{"text": {"content": x}}]
         ),
