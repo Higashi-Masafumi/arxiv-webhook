@@ -43,7 +43,7 @@ class ArxivInfoNotionMapper(NotionMapper[ArxivInfo]):
         RichTextProperty, RichTextPropertyRequest, StrictStr
     ] = Field(
         notion_name="Summary",
-        parser=lambda x: x.rich_text[0].plain_text,
+        parser=lambda x: x.rich_text[0].plain_text if len(x.rich_text) > 0 else "",
         request_builder=lambda x: RichTextPropertyRequest(
             rich_text=[{"text": {"content": x}}]
         ),
