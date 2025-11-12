@@ -7,7 +7,6 @@ from notion_py_client.properties import (
     RichTextProperty,
     NumberProperty,
     UrlProperty,
-    NotionPropertyType,
 )
 from notion_py_client.requests import (
     TitlePropertyRequest,

@@ -1,10 +1,9 @@
 import os
 from logging import INFO, FileHandler, getLogger
-import time
 from typing import Awaitable, Callable
 import sentry_sdk
 from dotenv import load_dotenv
-from fastapi import BackgroundTasks, Depends, FastAPI, Request, Response
+from fastapi import Depends, FastAPI, Request, Response
 from notion_py_client import NotionAsyncClient
 from notion import NotionPaperRepository
 from arxiv_fetcher import ArxivInfoFetcher
@@ -38,20 +37,19 @@ async def check_attempt(
 ) -> Response:
     # Simple middleware to log incoming requests
     logger.info(f"Incoming request: {request.method} {request.url}")
+    # Post以外は無視する
+    if request.method != "POST":
+        return await call_next(request)
     request_data = await request.json()
     logger.info(f"Request data: {request_data}")
     response = await call_next(request)
     return response
 
-def sleep(seconds: int):
-    time.sleep(seconds)
-    print(f"Slept for {seconds} seconds")
 
-
-@app.post("/")
-async def root(background_tasks: BackgroundTasks):
-    background_tasks.add_task(sleep, 100)  # Intentional delay for testing
+@app.get("/")
+async def root():
     return {"message": "ArXiv Webhook Service"}
+
 
 @app.post("/health")
 async def health_check():
