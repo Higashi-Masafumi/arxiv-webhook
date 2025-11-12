@@ -46,7 +46,7 @@ class ArxivInfoFetcher:
 
     def _extract_arxiv_id(self, url: str) -> str | None:
         """arxivのURLからarxiv IDを抽出する"""
-        match = re.search(r"arxiv\.org/(abs|pdf)/([^?#\s]+)", url)
+        match = re.search(r"(arxiv|alphaxiv)\.org/(abs|pdf)/([^?#\s]+)", url)
         if match:
-            return match.group(2)  # 2番目のグループ（論文ID）を返す
+            return match.group(3)  # 3番目のグループ(論文ID)を返す
         return None
