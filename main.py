@@ -1,11 +1,14 @@
 import os
 from logging import INFO, FileHandler, getLogger
+import time
+from typing import Awaitable, Callable
 import sentry_sdk
 from dotenv import load_dotenv
-from fastapi import Depends, FastAPI, Request
+from fastapi import BackgroundTasks, Depends, FastAPI, Request, Response
 from notion_py_client import NotionAsyncClient
 from notion import NotionPaperRepository
 from arxiv_fetcher import ArxivInfoFetcher
+
 load_dotenv()
 
 app = FastAPI()
@@ -29,9 +32,30 @@ def arxiv_fetcher() -> ArxivInfoFetcher:
     return ArxivInfoFetcher()
 
 
-@app.get("/")
-async def root():
+@app.middleware("http")
+async def check_attempt(
+    request: Request, call_next: Callable[[Request], Awaitable[Response]]
+) -> Response:
+    # Simple middleware to log incoming requests
+    logger.info(f"Incoming request: {request.method} {request.url}")
+    request_data = await request.json()
+    logger.info(f"Request data: {request_data}")
+    response = await call_next(request)
+    return response
+
+def sleep(seconds: int):
+    time.sleep(seconds)
+    print(f"Slept for {seconds} seconds")
+
+
+@app.post("/")
+async def root(background_tasks: BackgroundTasks):
+    background_tasks.add_task(sleep, 100)  # Intentional delay for testing
     return {"message": "ArXiv Webhook Service"}
+
+@app.post("/health")
+async def health_check():
+    return {"status": "ok"}
 
 
 @app.get("/sentry-debug")
@@ -55,6 +79,7 @@ async def webhook(
     await notion_repo.update_paper(updated_info)
 
     return {"message": "Webhook received"}
+
 
 if __name__ == "__main__":
     import uvicorn

@@ -68,19 +68,19 @@ class ArxivInfoNotionMapper(NotionMapper[ArxivInfo]):
     def to_domain(self, notion_page: NotionPage) -> ArxivInfo:
         properties = notion_page.properties
         title_prop = properties[self.title_field.notion_name]
-        if title_prop.type != NotionPropertyType.TITLE:
+        if title_prop.type != "title":
             raise ValueError("Invalid property type for title")
         authors_prop = properties[self.authors_field.notion_name]
-        if authors_prop.type != NotionPropertyType.RICH_TEXT:
+        if authors_prop.type != "rich_text":
             raise ValueError("Invalid property type for authors")
         url_prop = properties[self.url_field.notion_name]
-        if url_prop.type != NotionPropertyType.URL:
+        if url_prop.type != "url":
             raise ValueError("Invalid property type for URL")
         summary_prop = properties[self.summary_field.notion_name]
-        if summary_prop.type != NotionPropertyType.RICH_TEXT:
+        if summary_prop.type != "rich_text":
             raise ValueError("Invalid property type for summary")
         publication_year_prop = properties[self.publication_date_field.notion_name]
-        if publication_year_prop.type != NotionPropertyType.NUMBER:
+        if publication_year_prop.type != "number":
             raise ValueError("Invalid property type for publication year")
         return ArxivInfo(
             page_id=notion_page.id,
